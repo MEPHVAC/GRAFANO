@@ -35,7 +35,7 @@
 
         <div class="slider-container">
             <label for="velocidadSlider">Velocidad: <span id="velocidadTexto">2.0x</span></label>
-            <input type="range" id="velocidadSlider" min="1.0" max="4.0" step="1" value="2.0">
+            <input type="range" id="velocidadSlider" min="1.0" max="8.0" step="0.1" value="2">
         </div>
     </div>
     <script>
@@ -55,9 +55,8 @@
 
         velocidadSlider.addEventListener("input", () => {
             const velocidad = parseFloat(velocidadSlider.value);
-            ventilador.style.animationDuration = (4 - velocidad) + "s";
-            velocidadTexto.textContent = ventilador.style.animationDuration;
-            //velocidadTexto.textContent = velocidad.toFixed(1) + "x";
+            ventilador.style.animationDuration = Math.abs(8.5 - velocidad) + "s";
+            velocidadTexto.textContent = velocidad.toFixed(1) + "x";
         });
 
     </script>
