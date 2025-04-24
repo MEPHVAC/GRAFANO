@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ventilador Girando</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        #ventilador {
+            width: 200px;
+            height: 200px;
+            animation: girar 2s linear infinite;
+        }
+
+        @keyframes girar {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <img id="ventilador" src="media/ventilador.svg"></img>
+
+    <div class="controles">
+        <button id="toggle">Pausar</button>
+
+        <div class="slider-container">
+            <label for="velocidadSlider">Velocidad: <span id="velocidadTexto">2.0x</span></label>
+            <input type="range" id="velocidadSlider" min="1.0" max="4.0" step="1" value="2.0">
+        </div>
+    </div>
+    <script>
+        let ventilador = document.getElementById("ventilador");
+        let boton = document.getElementById("toggle");
+        let velocidadSlider = document.getElementById("velocidadSlider");
+        
+        boton.addEventListener("click", function() {
+            if (ventilador.style.animationPlayState === "paused") {
+                ventilador.style.animationPlayState = "running";
+                boton.innerText = "Pausar";
+            } else {
+                ventilador.style.animationPlayState = "paused";
+                boton.innerText = "Reanudar";
+            }
+        });
+
+        velocidadSlider.addEventListener("input", () => {
+            const velocidad = parseFloat(velocidadSlider.value);
+            ventilador.style.animationDuration = (4 - velocidad) + "s";
+            velocidadTexto.textContent = ventilador.style.animationDuration;
+            //velocidadTexto.textContent = velocidad.toFixed(1) + "x";
+        });
+
+    </script>
+</body>
