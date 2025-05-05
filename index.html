@@ -3,61 +3,24 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Ventilador Girando</title>
-    <style>
-        body {
-            font-family: sans-serif;
-        }
-
-        #ventilador {
-            width: 200px;
-            height: 200px;
-            animation: girar 2s linear infinite;
-        }
-
-        @keyframes girar {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-    </style>
+    <title>Ventiladores</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <img id="ventilador" src="media/ventilador.svg"></img>
 
-    <div class="controles">
-        <button id="toggle">Pausar</button>
+    <button id="toggleValores">Mostrar</button>
 
-        <div class="slider-container">
-            <label for="velocidadSlider">Velocidad: <span id="velocidadTexto">2.0x</span></label>
-            <input type="range" id="velocidadSlider" min="1.0" max="8.0" step="0.1" value="2">
-        </div>
+    <div class="ventiladores">
+        <!-- Cuatro ventiladores -->
+        <div class="ventilador-container" data-id="1"></div>
+        <div class="ventilador-container" data-id="2"></div>
+        <div class="ventilador-container" data-id="3"></div>
+        <div class="ventilador-container" data-id="4"></div>
     </div>
-    <script>
-        let ventilador = document.getElementById("ventilador");
-        let boton = document.getElementById("toggle");
-        let velocidadSlider = document.getElementById("velocidadSlider");
-        
-        boton.addEventListener("click", function() {
-            if (ventilador.style.animationPlayState === "paused") {
-                ventilador.style.animationPlayState = "running";
-                boton.innerText = "Pausar";
-            } else {
-                ventilador.style.animationPlayState = "paused";
-                boton.innerText = "Reanudar";
-            }
-        });
 
-        velocidadSlider.addEventListener("input", () => {
-            const velocidad = parseFloat(velocidadSlider.value);
-            ventilador.style.animationDuration = Math.abs(8.5 - velocidad) + "s";
-            velocidadTexto.textContent = velocidad.toFixed(1) + "x";
-        });
+    <script src="script.js"></script>
 
-    </script>
 </body>
+
+</html>
