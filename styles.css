@@ -1,5 +1,13 @@
+/* Importar fuente Grandview */
+@font-face {
+    font-family: 'Grandview';
+    src: url('fonts/Grandview.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
-    font-family: sans-serif;
+    font-family: 'Grandview', sans-serif;
     text-align: center;
     margin: 0;
     padding: 20px;
