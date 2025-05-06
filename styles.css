@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-/* Importar fuente Grandview */
-=======
-/* fuente Grandview */
->>>>>>> bb58898 (ACTUALIZACION)
 @font-face {
     font-family: 'Grandview';
     src: url('fonts/Grandview.ttf') format('truetype');
@@ -10,32 +5,47 @@
     font-style: normal;
 }
 
+/* === ESTILOS GENERALES DEL CUERPO === */
 body {
     font-family: 'Grandview', sans-serif;
     text-align: center;
+    /* Centra el texto por defecto */
     margin: 0;
+    /* Elimina márgenes del navegador */
     padding: 20px;
+    /* Espaciado interno general */
 }
 
+/* === CONTENEDOR GENERAL DE VENTILADORES === */
 .ventiladores {
     display: flex;
+    /* Layout flexible (horizontales) */
     flex-wrap: wrap;
+    /* Permite salto de línea cuando no caben */
     justify-content: center;
+    /* Centra los elementos */
     gap: 10px;
+    /* Espacio entre ventiladores */
     margin-top: 50px;
+    /* Separación superior */
 }
 
+/* === CONTENEDOR INDIVIDUAL DE CADA VENTILADOR === */
 .ventilador-container {
     display: flex;
     flex-direction: column;
+    /* Elementos en columna */
     align-items: center;
+    /* Centra horizontalmente los contenidos */
     flex: 1 1 250px;
+    /* Se adapta según el espacio disponible */
     max-width: 300px;
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 10px;
 }
 
+/* === IMAGEN DEL VENTILADOR (ANIMADO) === */
 .ventilador {
     width: 100px;
     height: 100px;
@@ -50,19 +60,34 @@ body {
     100% {
         transform: rotate(360deg);
     }
+
+    /* Gira completamente */
 }
 
 .valores {
     display: none;
+    /* Oculto por defecto */
     margin-top: 10px;
+    /* Espaciado superior */
     text-align: right;
     width: 100%;
 }
 
+/* === FORMATO DE CADA FILA DE VALORES === */
 .valores p {
     margin: 2px 0;
     display: flex;
+    /* Usa flex para alineación horizontal */
     justify-content: flex-end;
+    /* Alinea el contenido a la derecha */
+}
+
+/* === ETIQUETAS DE LOS VALORES === */
+.etiqueta,
+.valor-num,
+.unidades {
+    display: inline-block;
+    text-align: right;
 }
 
 .etiqueta {
@@ -73,14 +98,13 @@ body {
 }
 
 .valor-num {
-    display: inline-block;
     width: 50px;
     text-align: right;
 }
 
 .unidades {
-    display: inline-block;
     width: 30px;
+    /* Espacio para unidades (W, A, Hz, etc.) */
     text-align: left;
     margin-left: 5px;
 }
@@ -93,9 +117,11 @@ button {
     margin-top: 5px;
 }
 
+/* === RESPONSIVIDAD EN PANTALLAS PEQUEÑAS === */
 @media (max-width: 600px) {
     .ventilador-container {
         max-width: 100%;
+        /* Ocupa todo el ancho en móviles */
     }
 }
 
@@ -104,6 +130,7 @@ input[type="range"] {
     width: 100%;
     height: 6px;
     background: #ccc;
+    /* Color de fondo gris */
     border-radius: 3px;
     outline: none;
 }
@@ -126,8 +153,6 @@ input[type="range"]::-ms-track {
     background: #c5d6e9;
     height: 6px;
     border-radius: 3px;
-    border: none;
-    color: transparent;
 }
 
 /* Círculo del control (thumb) */
@@ -136,6 +161,7 @@ input[type="range"]::-webkit-slider-thumb {
     background: #e86ff3;
     border: none;
     border-radius: 50%;
+    /* Forma redonda */
     width: 16px;
     height: 16px;
     cursor: pointer;
