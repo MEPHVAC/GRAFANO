@@ -1,88 +1,60 @@
-const FRECUENCIA_MIN = 30;
-const FRECUENCIA_MAX = 60;
-
 const toggleBtn = document.getElementById("toggleValores");
 const containers = document.querySelectorAll(".ventilador-container");
-
 let valoresVisibles = false;
 
-// Genera el contenido HTML de cada ventilador
-function crearVentilador(container) {
+containers.forEach(container => {
     const id = container.dataset.id;
 
     container.innerHTML = `
-        <img src="media/ventilador.svg" class="ventilador" data-id="${id}">
-        <button class="btn-pausa" data-id="${id}">Pausar</button>
-
+        <img src="media/ventilador.svg" class="ventilador" id="fan${id}">
+        <button id="pause${id}" class="btn-off">OFF</button>
         <div class="slider-container">
-            Frecuencia: <span class="freq-text" data-id="${id}">${FRECUENCIA_MIN.toFixed(1)}</span> Hz
-            <input type="range" 
-                   class="freq-slider" 
-                   data-id="${id}" 
-                   min="${FRECUENCIA_MIN}" 
-                   max="${FRECUENCIA_MAX}" 
-                   step="0.1" 
-                   value="${FRECUENCIA_MIN}">
+            Hz: <span id="freqText${id}">30.0</span> Hz
+            <input type="range" id="freqSlider${id}" min="30" max="60" step="0.1" value="30">
         </div>
-
         <div class="valores">
-            <p><span class="etiqueta">Potencia:</span> <span class="valor-num pot"></span><span class="unidades">%</span></p>
-            <p><span class="etiqueta">Frecuencia:</span> <span class="valor-num freq"></span><span class="unidades">Hz</span></p>
-            <p><span class="etiqueta">Corriente:</span> <span class="valor-num corr"></span><span class="unidades">A</span></p>
-            <p><span class="etiqueta">Potencia activa:</span> <span class="valor-num kw"></span><span class="unidades">kW</span></p>
-            <p><span class="etiqueta">Energía:</span> <span class="valor-num kwh"></span><span class="unidades">kWh</span></p>
-            <p><span class="etiqueta">Horas:</span> <span class="valor-num h">0.00</span><span class="unidades">h</span></p>
+            <p><span class="etiqueta">Potencia:</span> <span class="valor-num" id="pot${id}">25</span><span class="unidades">%</span></p>
+            <p><span class="etiqueta">Frecuencia:</span> <span class="valor-num" id="freq${id}">30.0</span><span class="unidades">Hz</span></p>
+            <p><span class="etiqueta">Corriente:</span> <span class="valor-num" id="corr${id}">2.40</span><span class="unidades">A</span></p>
+            <p><span class="etiqueta">Potencia activa:</span> <span class="valor-num" id="kw${id}">0.30</span><span class="unidades">kW</span></p>
+            <p><span class="etiqueta">Energía:</span> <span class="valor-num" id="kwh${id}">0.001</span><span class="unidades">kWh</span></p>
+            <p><span class="etiqueta">Horas:</span> <span class="valor-num" id="h${id}">0.00</span><span class="unidades">h</span></p>
         </div>
     `;
-}
 
-// Maneja la pausa/reanudación de animación
-function toggleAnimacion(fan, button) {
-    const isPaused = fan.style.animationPlayState === "paused";
-    fan.style.animationPlayState = isPaused ? "running" : "paused";
-    button.textContent = isPaused ? "Pausar" : "Reanudar";
-}
+    const fan = document.getElementById(`fan${id}`);
+    const pauseBtn = document.getElementById(`pause${id}`);
+    const slider = document.getElementById(`freqSlider${id}`);
+    const freqText = document.getElementById(`freqText${id}`);
 
-// Actualiza los valores al mover el slider
-function actualizarValores(container, frecuencia) {
-    const fan = container.querySelector(".ventilador");
-    const freqText = container.querySelector(".freq-text");
-    const valores = container.querySelector(".valores");
+    pauseBtn.addEventListener("click", () => {
+        const isPaused = fan.style.animationPlayState === "paused";
+        fan.style.animationPlayState = isPaused ? "running" : "paused";
+        pauseBtn.textContent = isPaused ? "OFF" : "ON";
+        pauseBtn.classList.toggle("btn-on", !isPaused);
+        pauseBtn.classList.toggle("btn-off", isPaused);
+    });
 
-    const actualFreq = frecuencia - 15;
-    const duracion = (6 / actualFreq).toFixed(2);
-    fan.style.animationDuration = `${duracion}s`;
+    slider.addEventListener("input", () => {
+        const Fans_Hz = parseFloat(slider.value);
+        const duracion = ((-0.9 / 30) * (Fans_Hz - 29) + 1.1).toFixed(3); /* la animacion se ve bien entre 0.2S y 2.0S de duracion */
+        fan.style.animationDuration = `${duracion}s`;
+        freqText.textContent = Fans_Hz.toFixed(1);
+        document.getElementById(`freq${id}`).textContent = Fans_Hz.toFixed(1);
+        document.getElementById(`pot${id}`).textContent = Math.round((Fans_Hz - 30) / 30 * 100);
+        document.getElementById(`corr${id}`).textContent = Fans_Hz.toFixed(1);
+        document.getElementById(`kw${id}`).textContent = (Fans_Hz).toFixed(1);
+        document.getElementById(`kwh${id}`).textContent = (duracion).toFixed(2);
+        document.getElementById(`h${id}`).textContent = "0.00";
+    });
 
-    // Mostrar valores
-    freqText.textContent = frecuencia.toFixed(1);
-    valores.querySelector(".freq").textContent = frecuencia.toFixed(1);
-    valores.querySelector(".pot").textContent = Math.round((frecuencia - FRECUENCIA_MIN) / (FRECUENCIA_MAX - FRECUENCIA_MIN) * 100);
-    valores.querySelector(".corr").textContent = actualFreq.toFixed(2);
-    valores.querySelector(".kw").textContent = (actualFreq * 0.15).toFixed(1);
-    valores.querySelector(".kwh").textContent = (actualFreq * 0.0005).toFixed(3);
-}
-
-// Inicializa cada ventilador
-containers.forEach(container => {
-    crearVentilador(container);
-
-    const id = container.dataset.id;
-    const fan = container.querySelector(".ventilador");
-    const pauseBtn = container.querySelector(".btn-pausa");
-    const slider = container.querySelector(".freq-slider");
-
-    pauseBtn.addEventListener("click", () => toggleAnimacion(fan, pauseBtn));
-    slider.addEventListener("input", () => actualizarValores(container, parseFloat(slider.value)));
-
-    // Inicializa valores al cargar
     slider.dispatchEvent(new Event("input"));
 });
 
-// Mostrar / ocultar valores con classList.toggle()
 toggleBtn.addEventListener("click", () => {
     valoresVisibles = !valoresVisibles;
     document.querySelectorAll(".valores").forEach(val => {
-        val.classList.toggle("visible", valoresVisibles);
+        val.style.display = valoresVisibles ? "block" : "none";
     });
     toggleBtn.textContent = valoresVisibles ? "Ocultar" : "Mostrar";
 });
