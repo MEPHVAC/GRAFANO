@@ -37,6 +37,12 @@ body {
     padding: 5px;
 }
 
+.ventilador path {
+    fill: rgba(50, 186, 71, 0.509);
+
+}
+
+
 .ventilador {
     width: 50px;
     height: 50px;
