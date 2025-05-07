@@ -3,99 +3,25 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Ventilador Girando</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            font-family: sans-serif;
-        }
-
-        video {
-            width: 200px;
-            height: 200px;
-        }
-
-        .controles {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .slider-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        input[type="range"] {
-            width: 200px;
-        }
-
-        label {
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-    </style>
+    <title>Ventiladores</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <video id="ventilador" src="ventilador.webm" autoplay loop muted></video>
 
-    <div class="controles">
-        <button id="toggle">Pausar</button>
+    <button id="toggleValores">Mostrar</button>
 
-        <div class="slider-container">
-            <label for="velocidadSlider">Velocidad: <span id="velocidadTexto">5.0x</span></label>
-            <input type="range" id="velocidadSlider" min="1.0" max="40.0" step="1" value="40.0">
-        </div>
+    <div class="ventiladores">
+        <!-- Cuatro ventiladores -->
+        <div class="ventilador-container" data-id="1"></div>
+        <div class="ventilador-container" data-id="2"></div>
+        <div class="ventilador-container" data-id="3"></div>
+        <div class="ventilador-container" data-id="4"></div>
+
     </div>
 
-    <script>
-        const video = document.getElementById("ventilador");
-        const btnToggle = document.getElementById("toggle");
-        const slider = document.getElementById("velocidadSlider");
-        const velocidadTexto = document.getElementById("velocidadTexto");
+    <script src="script.js"></script>
 
-        btnToggle.addEventListener("click", () => {
-            if (video.paused) {
-                video.play();
-                btnToggle.textContent = "Pausar";
-            } else {
-                video.pause();
-                btnToggle.textContent = "Iniciar";
-            }
-        });
-
-        slider.addEventListener("input", () => {
-            const velocidad = parseFloat(slider.value);
-            video.playbackRate = velocidad;
-            velocidadTexto.textContent = velocidad.toFixed(1) + "x";
-        });
-
-        // Establecer velocidad inicial a 5x
-        video.playbackRate = 5.0;
-    </script>
 </body>
 
 </html>
