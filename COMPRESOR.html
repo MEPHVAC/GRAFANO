@@ -3,86 +3,103 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Animación por Capas</title>
+    <title>Animación SVG por Capas</title>
     <style>
-        #svgContainer {
-            width: 600px;
-            /* Puedes ajustar este tamaño */
-            max-width: 100%;
-            margin: auto;
+        body {
+            background: white;
+            color: black;
+            font-family: sans-serif;
+            text-align: center;
+            margin-top: 20px;
         }
 
         svg {
-            width: 100%;
+            width: 400px;
             height: auto;
-            display: block;
         }
 
-        button {
-            display: block;
-            margin: 1rem auto;
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
+        #toggleButton {
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
-    <button id="toggleBtn">OFF</button>
-    <div id="svgContainer"></div>
+
+    <h1>Animación SVG por Capas</h1>
+
+    <object id="svgObject" type="image/svg+xml" data="media/COMP.svg"></object>
+    <br>
+    <button id="toggleButton">Estado: OFF</button>
 
     <script>
-        let toggle = false;
-        const btn = document.getElementById('toggleBtn');
-        const svgContainer = document.getElementById('svgContainer');
-        let interval;
-        let direction = 1;
-        let currentLayer = 2;
-        let layers = [];
+        const button = document.getElementById("toggleButton");
+        const svgObject = document.getElementById("svgObject");
+        let isOn = false;
+        let animationInterval = null;
 
-        fetch('media/COMP.svg')
-            .then(res => res.text())
-            .then(svgText => {
-                svgContainer.innerHTML = svgText;
+        // Capas que se animan
+        const animationLayers = [
+            "g42839", "g42843", "g42847", "g42851",
+            "g42855", "g42859", "g42863", "g42867",
+            "g42875", "g42879", "g42883", "g42887"
+        ];
 
-                // Obtener referencia a todas las capas
-                layers = [];
-                for (let i = 1; i <= 13; i++) {
-                    const layer = document.getElementById(`layer${i}`);
-                    if (layer) layers.push(layer);
-                }
+        const offLayer = "layer1"; // Se muestra cuando está en OFF
 
-                showOnlyLayer(1); // Mostrar solo la primera capa al principio
+        function toggleState() {
+            isOn = !isOn;
+            button.textContent = `Estado: ${isOn ? "ON" : "OFF"}`;
+
+            const svgDoc = svgObject.contentDocument;
+            if (!svgDoc) return;
+
+            // Oculta todo primero
+            animationLayers.forEach(id => {
+                const el = svgDoc.getElementById(id);
+                if (el) el.style.display = "none";
             });
 
-        btn.addEventListener('click', () => {
-            toggle = !toggle;
-            btn.textContent = toggle ? 'ON' : 'OFF';
+            const offEl = svgDoc.getElementById(offLayer);
+            if (offEl) offEl.style.display = isOn ? "none" : "inline";
 
-            if (toggle) {
-                interval = setInterval(() => {
-                    if (direction === 1 && currentLayer > 13) {
-                        direction = -1;
-                        currentLayer = 12;
-                    } else if (direction === -1 && currentLayer < 2) {
-                        direction = 1;
-                        currentLayer = 2;
+            if (isOn) {
+                let index = 0;
+                let forward = true;
+
+                animationInterval = setInterval(() => {
+                    animationLayers.forEach((id, i) => {
+                        const el = svgDoc.getElementById(id);
+                        if (el) el.style.display = (i === index) ? "inline" : "none";
+                    });
+
+                    if (forward) {
+                        index++;
+                        if (index === animationLayers.length) {
+                            index = animationLayers.length - 2;
+                            forward = false;
+                        }
+                    } else {
+                        index--;
+                        if (index < 0) {
+                            index = 1;
+                            forward = true;
+                        }
                     }
-
-                    showOnlyLayer(currentLayer);
-                    currentLayer += direction;
-                }, 300);
+                }, 200); // velocidad: cada 200ms
             } else {
-                clearInterval(interval);
-                showOnlyLayer(1);
-            }
-        });
-
-        function showOnlyLayer(layerToShow) {
-            for (let i = 0; i < layers.length; i++) {
-                layers[i].style.display = (i + 1 === layerToShow) ? 'inline' : 'none';
+                clearInterval(animationInterval);
             }
         }
+
+        svgObject.addEventListener("load", () => {
+            toggleState(); // Inicializa en OFF mostrando solo layer1
+        });
+
+        button.addEventListener("click", toggleState);
     </script>
 </body>
 
