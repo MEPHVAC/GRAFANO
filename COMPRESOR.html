@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Animación por Capas</title>
+    <style>
+        #svgContainer {
+            width: 600px;
+            /* Puedes ajustar este tamaño */
+            max-width: 100%;
+            margin: auto;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        button {
+            display: block;
+            margin: 1rem auto;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="toggleBtn">OFF</button>
+    <div id="svgContainer"></div>
+
+    <script>
+        let toggle = false;
+        const btn = document.getElementById('toggleBtn');
+        const svgContainer = document.getElementById('svgContainer');
+        let interval;
+        let direction = 1;
+        let currentLayer = 2;
+        let layers = [];
+
+        fetch('media/COMP.svg')
+            .then(res => res.text())
+            .then(svgText => {
+                svgContainer.innerHTML = svgText;
+
+                // Obtener referencia a todas las capas
+                layers = [];
+                for (let i = 1; i <= 13; i++) {
+                    const layer = document.getElementById(`layer${i}`);
+                    if (layer) layers.push(layer);
+                }
+
+                showOnlyLayer(1); // Mostrar solo la primera capa al principio
+            });
+
+        btn.addEventListener('click', () => {
+            toggle = !toggle;
+            btn.textContent = toggle ? 'ON' : 'OFF';
+
+            if (toggle) {
+                interval = setInterval(() => {
+                    if (direction === 1 && currentLayer > 13) {
+                        direction = -1;
+                        currentLayer = 12;
+                    } else if (direction === -1 && currentLayer < 2) {
+                        direction = 1;
+                        currentLayer = 2;
+                    }
+
+                    showOnlyLayer(currentLayer);
+                    currentLayer += direction;
+                }, 300);
+            } else {
+                clearInterval(interval);
+                showOnlyLayer(1);
+            }
+        });
+
+        function showOnlyLayer(layerToShow) {
+            for (let i = 0; i < layers.length; i++) {
+                layers[i].style.display = (i + 1 === layerToShow) ? 'inline' : 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>

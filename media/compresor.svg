@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Compresor (Apagado por defecto, en gris) -->
+  <rect id="compresor" x="40" y="40" width="120" height="120" rx="10" fill="gray"/>
+
+  <!-- Pistón (Moviéndose arriba y abajo) -->
+  <rect id="piston" x="90" y="50" width="20" height="40" fill="red">
+    <animate attributeName="y" values="50;90;50" dur="1s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Botón de encendido/apagado -->
+  <text id="toggle" x="60" y="180" font-size="18" fill="white" cursor="pointer">Encender</text>
+  <script>
+    let isOn = false;
+    document.getElementById("toggle").addEventListener("click", () => {
+      isOn = !isOn;
+      document.getElementById("compresor").setAttribute("fill", isOn ? "yellow" : "gray");
+      document.getElementById("toggle").textContent = isOn ? "Apagar" : "Encender";
+    });
+  </script>
+</svg>
