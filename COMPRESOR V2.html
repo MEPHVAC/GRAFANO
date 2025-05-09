@@ -3,65 +3,109 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Animación SVG por Capas</title>
+    <title>5 Compresores Animados</title>
     <style>
         body {
             background: white;
-            color: black;
             font-family: sans-serif;
             text-align: center;
             margin: 20px;
         }
 
+        .compresores {
+            display: flex;
+            justify-content: center;
+            /* Antes: space-around */
+            flex-wrap: wrap;
+            gap: 10px;
+            /* Antes: 20px */
+        }
+
+        .compresor {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         object {
-            width: 400px;
+            width: 150px;
             height: auto;
-            display: block;
-            margin: auto;
         }
 
         .controls {
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
-        #toggleButton {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        #speedSlider {
-            width: 200px;
-            margin-left: 10px;
-        }
-
-        #speedValue {
-            font-weight: bold;
-            margin-left: 5px;
+        button {
+            margin-top: 5px;
+            padding: 6px 12px;
         }
     </style>
+
 </head>
 
 <body>
-    <h1>Animación SVG por Capas</h1>
+    <h1>Control de 5 Compresores</h1>
 
-    <object id="svgObject" type="image/svg+xml" data="media/COMP.svg"></object>
+    <div class="compresores">
+        <!-- 5 compresores -->
+        <div class="compresor">
+            <object type="image/svg+xml" data="media/COMP.svg"></object>
+            <div class="controls">
+                <label>
+                    Vel:
+                    <input type="range" min="5" max="30" step="1" value="20">
+                </label>
+                <button>OFF</button>
+            </div>
+        </div>
 
-    <div class="controls">
-        <button id="toggleButton">Estado: OFF</button>
-        <label>
-            Velocidad:
-            <input type="range" id="speedSlider" min="5" max="10" step="0.1" value="7.5">
-            <span id="speedValue">10ms</span>
-        </label>
+        <div class="compresor">
+            <object type="image/svg+xml" data="media/COMP.svg"></object>
+            <div class="controls">
+                <label>
+                    Vel:
+                    <input type="range" min="5" max="30" step="1" value="20">
+                </label>
+                <button>OFF</button>
+            </div>
+        </div>
+
+        <div class="compresor">
+            <object type="image/svg+xml" data="media/COMP.svg"></object>
+            <div class="controls">
+                <label>
+                    Vel:
+                    <input type="range" min="5" max="30" step="1" value="20">
+                </label>
+                <button>OFF</button>
+            </div>
+        </div>
+
+        <div class="compresor">
+            <object type="image/svg+xml" data="media/COMP.svg"></object>
+            <div class="controls">
+                <label>
+                    Vel:
+                    <input type="range" min="5" max="30" step="1" value="20">
+                </label>
+                <button>OFF</button>
+            </div>
+        </div>
+
+        <div class="compresor">
+            <object type="image/svg+xml" data="media/COMP.svg"></object>
+            <div class="controls">
+                <label>
+                    Vel:
+                    <input type="range" min="5" max="30" step="1" value="20">
+                </label>
+                <button>OFF</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const button = document.getElementById("toggleButton");
-        const svgObject = document.getElementById("svgObject");
-        const slider = document.getElementById("speedSlider");
-        const speedValue = document.getElementById("speedValue");
-
         const animationLayers = [
             "g42839", "g42843", "g42847", "g42851",
             "g42855", "g42859", "g42863", "g42867",
@@ -69,70 +113,74 @@
         ];
 
         const offLayer = "layer1";
-        let isOn = false;
-        let intervalId = null;
-        let speed = +slider.value;
-        let svgDoc = null;
 
-        const updateSpeed = () => {
-            speed = +slider.value;
-            speedValue.textContent = `${speed}ms`;
-            if (isOn) startAnimation();
-        };
+        document.querySelectorAll('.compresor').forEach(compresor => {
+            const svgObj = compresor.querySelector('object');
+            const slider = compresor.querySelector('input[type="range"]');
+            const button = compresor.querySelector('button');
 
-        const showOnlyLayer = (id) => {
-            animationLayers.forEach(layerId => {
-                const el = svgDoc.getElementById(layerId);
-                if (el) el.style.display = (layerId === id) ? "inline" : "none";
-            });
-        };
+            let isOn = false;
+            let intervalId = null;
+            let svgDoc = null;
 
-        const startAnimation = () => {
-            clearInterval(intervalId);
-            let index = 0, forward = true;
+            const showOnlyLayer = (id) => {
+                animationLayers.forEach(layerId => {
+                    const el = svgDoc.getElementById(layerId);
+                    if (el) el.style.display = (layerId === id) ? "inline" : "none";
+                });
+            };
 
-            intervalId = setInterval(() => {
-                showOnlyLayer(animationLayers[index]);
+            const startAnimation = () => {
+                clearInterval(intervalId);
+                let index = 0;
+                let forward = true;
+                const speed = parseInt(slider.value, 10);
 
-                if (forward) {
-                    index++;
-                    if (index === animationLayers.length) {
-                        index = animationLayers.length - 2;
-                        forward = false;
+                intervalId = setInterval(() => {
+                    showOnlyLayer(animationLayers[index]);
+
+                    if (forward) {
+                        index++;
+                        if (index === animationLayers.length) {
+                            index = animationLayers.length - 2;
+                            forward = false;
+                        }
+                    } else {
+                        index--;
+                        if (index < 0) {
+                            index = 1;
+                            forward = true;
+                        }
                     }
-                } else {
-                    index--;
-                    if (index < 0) {
-                        index = 1;
-                        forward = true;
-                    }
-                }
-            }, speed);
-        };
+                }, speed);
+            };
 
-        const toggleState = () => {
-            isOn = !isOn;
-            button.textContent = `Estado: ${isOn ? "ON" : "OFF"}`;
+            const toggleState = () => {
+                if (!svgDoc) return;
+                isOn = !isOn;
+                button.textContent = isOn ? "ON" : "OFF";
 
-            if (!svgDoc) return;
+                animationLayers.forEach(id => {
+                    const el = svgDoc.getElementById(id);
+                    if (el) el.style.display = "none";
+                });
 
-            animationLayers.forEach(id => {
-                const el = svgDoc.getElementById(id);
-                if (el) el.style.display = "none";
+                const offEl = svgDoc.getElementById(offLayer);
+                if (offEl) offEl.style.display = isOn ? "none" : "inline";
+
+                isOn ? startAnimation() : clearInterval(intervalId);
+            };
+
+            svgObj.addEventListener("load", () => {
+                svgDoc = svgObj.contentDocument;
+                toggleState(); // inicia en OFF
             });
 
-            const offEl = svgDoc.getElementById(offLayer);
-            if (offEl) offEl.style.display = isOn ? "none" : "inline";
+            button.addEventListener("click", toggleState);
 
-            isOn ? startAnimation() : clearInterval(intervalId);
-        };
-
-        slider.addEventListener("input", updateSpeed);
-        button.addEventListener("click", toggleState);
-
-        svgObject.addEventListener("load", () => {
-            svgDoc = svgObject.contentDocument;
-            toggleState(); // inicia en OFF
+            slider.addEventListener("input", () => {
+                if (isOn) startAnimation();
+            });
         });
     </script>
 </body>
