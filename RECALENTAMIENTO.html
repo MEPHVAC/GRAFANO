@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Recalentamiento</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+        }
+
+        #resultado {
+            color: red;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Cálculo de Recalentamiento</h2>
+
+    <label>
+        Presión de Succión (Bar): <span id="presionVal">4</span>
+        <input type="range" id="presion" min="-0.75" max="15.04" step="0.01" value="4" />
+    </label>
+
+    <label>
+        Temperatura de Succión (°C): <span id="temperaturaVal">10</span>
+        <input type="range" id="temperatura" min="-60" max="50" step="0.1" value="10" />
+    </label>
+
+    <div id="resultado">Recalentamiento: -- °C</div>
+
+    <script>
+        const tablaPT = [
+            { P: -0.75, T: -58 }, { P: -0.7, T: -55.1 }, { P: -0.65, T: -52.6 },
+            { P: -0.6, T: -50.3 }, { P: -0.55, T: -48.3 }, { P: -0.5, T: -46.5 },
+            { P: -0.45, T: -44.8 }, { P: -0.4, T: -43.3 }, { P: -0.35, T: -41.8 },
+            { P: -0.3, T: -40.4 }, { P: -0.25, T: -39.2 }, { P: -0.2, T: -37.9 },
+            { P: -0.15, T: -36.8 }, { P: -0.1, T: -35.7 }, { P: -0.05, T: -34.6 },
+            { P: 0.01, T: -33.3 }, { P: 0.08, T: -32 }, { P: 0.12, T: -30.8 },
+            { P: 0.22, T: -29.6 }, { P: 0.29, T: -28.4 }, { P: 0.36, T: -27.3 },
+            { P: 0.43, T: -26.3 }, { P: 0.5, T: -25.3 }, { P: 0.56, T: -24.3 },
+            { P: 0.63, T: -23.4 }, { P: 0.7, T: -22.5 }, { P: 0.77, T: -21.6 },
+            { P: 0.84, T: -20.7 }, { P: 0.91, T: -19.9 }, { P: 0.98, T: -19.1 },
+            { P: 1.05, T: -18.3 }, { P: 1.12, T: -17.6 }, { P: 1.19, T: -16.8 },
+            { P: 1.25, T: -16.1 }, { P: 1.32, T: -15.4 }, { P: 1.39, T: -14.7 },
+            { P: 1.46, T: -14 }, { P: 1.53, T: -13.4 }, { P: 1.6, T: -12.7 },
+            { P: 1.67, T: -12.1 }, { P: 1.74, T: -11.5 }, { P: 1.81, T: -10.9 },
+            { P: 1.87, T: -10.3 }, { P: 1.94, T: -9.7 }, { P: 2.01, T: -9.1 },
+            { P: 2.08, T: -8.6 }, { P: 2.11, T: -8.3 }, { P: 2.18, T: -7.8 },
+            { P: 2.25, T: -7.2 }, { P: 2.32, T: -6.7 }, { P: 2.24, T: -6.1 },
+            { P: 2.47, T: -5.6 }, { P: 2.55, T: -5 }, { P: 2.63, T: -4.4 },
+            { P: 2.7, T: -3.9 }, { P: 2.74, T: -3.3 }, { P: 2.87, T: -2.8 },
+            { P: 2.95, T: -2.2 }, { P: 3.03, T: -1.7 }, { P: 3.12, T: -1.1 },
+            { P: 3.21, T: -0.6 }, { P: 3.29, T: 0 }, { P: 3.38, T: 0.6 },
+            { P: 3.48, T: 1.1 }, { P: 3.57, T: 1.7 }, { P: 3.66, T: 2.2 },
+            { P: 3.76, T: 2.8 }, { P: 3.86, T: 3.3 }, { P: 3.95, T: 3.9 },
+            { P: 4.06, T: 4.4 }, { P: 4.16, T: 5 }, { P: 4.26, T: 5.6 },
+            { P: 4.37, T: 6.1 }, { P: 4.47, T: 6.7 }, { P: 4.58, T: 7.2 },
+            { P: 4.69, T: 7.8 }, { P: 4.8, T: 8.3 }, { P: 4.92, T: 8.9 },
+            { P: 5.03, T: 9.4 }, { P: 5.15, T: 10 }, { P: 5.27, T: 10.6 },
+            { P: 5.39, T: 11.1 }, { P: 5.51, T: 11.7 }, { P: 5.64, T: 12.2 },
+            { P: 5.76, T: 12.8 }, { P: 5.89, T: 13.3 }, { P: 6.02, T: 13.9 },
+            { P: 6.15, T: 14.4 }, { P: 6.29, T: 15 }, { P: 6.42, T: 15.6 },
+            { P: 6.56, T: 16.1 }, { P: 6.7, T: 16.7 }, { P: 6.84, T: 17.2 },
+            { P: 6.98, T: 17.8 }, { P: 7.13, T: 18.3 }, { P: 7.27, T: 18.9 },
+            { P: 7.42, T: 19.4 }, { P: 7.527, T: 20 }, { P: 7.73, T: 20.6 },
+            { P: 7.88, T: 21.1 }, { P: 8.04, T: 21.7 }, { P: 8.2, T: 22.2 },
+            { P: 8.36, T: 22.8 }, { P: 8.5, T: 23.3 }, { P: 8.69, T: 23.9 },
+            { P: 8.86, T: 24.4 }, { P: 9.03, T: 25 }, { P: 9.21, T: 25.6 },
+            { P: 9.38, T: 26.1 }, { P: 9.56, T: 26.7 }, { P: 9.74, T: 27.2 },
+            { P: 9.92, T: 27.8 }, { P: 10.1, T: 28.3 }, { P: 10.29, T: 28.9 },
+            { P: 10.48, T: 29.4 }, { P: 10.67, T: 30 }, { P: 10.87, T: 30.6 },
+            { P: 11.06, T: 31.1 }, { P: 11.26, T: 31.7 }, { P: 11.46, T: 32.2 },
+            { P: 11.67, T: 32.8 }, { P: 11.87, T: 33.3 }, { P: 12.08, T: 33.9 },
+            { P: 12.29, T: 34.4 }, { P: 12.51, T: 35 }, { P: 12.72, T: 35.6 },
+            { P: 12.94, T: 36.1 }, { P: 13.17, T: 36.7 }, { P: 13.39, T: 37.2 },
+            { P: 13.62, T: 37.8 }, { P: 13.85, T: 38.3 }, { P: 14.08, T: 38.9 },
+            { P: 14.32, T: 39.4 }, { P: 14.55, T: 40 }, { P: 14.8, T: 40.6 },
+            { P: 15.04, T: 41.1 }
+        ];
+
+        const presionSlider = document.getElementById('presion');
+        const temperaturaSlider = document.getElementById('temperatura');
+        const resultadoDiv = document.getElementById('resultado');
+        const presionVal = document.getElementById('presionVal');
+        const temperaturaVal = document.getElementById('temperaturaVal');
+
+        function interpolarTemperatura(presion) {
+            for (let i = 0; i < tablaPT.length - 1; i++) {
+                const p1 = tablaPT[i].P, t1 = tablaPT[i].T;
+                const p2 = tablaPT[i + 1].P, t2 = tablaPT[i + 1].T;
+
+                if (presion >= p1 && presion <= p2) {
+                    return t1 + ((presion - p1) / (p2 - p1)) * (t2 - t1);
+                }
+            }
+            return null;
+        }
+
+        function actualizar() {
+            const presion = parseFloat(presionSlider.value);
+            const tempSuccion = parseFloat(temperaturaSlider.value);
+            presionVal.textContent = presion;
+            temperaturaVal.textContent = tempSuccion;
+
+            const tempSat = interpolarTemperatura(presion);
+            if (tempSat === null) {
+                resultadoDiv.textContent = "Presión fuera de rango.";
+                return;
+            }
+
+            const recalentamiento = (tempSuccion - tempSat).toFixed(2);
+            resultadoDiv.innerHTML = `Recalentamiento: <b>${recalentamiento} °C</b><br>
+        Temp Saturación: ${tempSat.toFixed(2)} °C`;
+        }
+
+        presionSlider.addEventListener('input', actualizar);
+        temperaturaSlider.addEventListener('input', actualizar);
+
+        actualizar(); // Inicializa
+    </script>
+
+</body>
+
+</html>

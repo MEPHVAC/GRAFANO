@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Simulación Torre de Enfriamiento</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .piloto {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background-color: gray;
+            box-shadow: 0 0 10px #000;
+            margin-bottom: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .anillo {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 10px solid transparent;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .estado-ventilador {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .valor {
+            font-size: 2rem;
+            color: blue;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .sliders {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .output {
+            font-size: 1.2rem;
+        }
+
+        .panel-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slider-label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type=range] {
+            width: 200px;
+        }
+
+        .approach-set {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .chart-container {
+            margin-top: 2rem;
+            width: 1200px;
+            height: 300px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="panel-control">
+        <div id="estadoVentilador" class="estado-ventilador" style="color: red; display: none;">VENTILADOR APAGADO</div>
+        <div class="piloto" id="piloto">
+            <div class="anillo" id="anillo"></div>
+        </div>
+
+        <div class="output">
+            <strong>Approach Actual:</strong> <span id="actualApproach">0.0</span> °C
+        </div>
+        <div class="output">
+            <strong>Potencia Ventilador:</strong> <span id="potencia">0</span> %
+        </div>
+        <div class="chart-container">
+            <canvas id="grafico"></canvas>
+        </div>
+    </div>
+
+    <div class="sliders">
+        <div class="slider-container">
+            <div class="slider-label">Temperatura del Agua</div>
+            <div class="valor" id="tempAgua">25.0 °C</div>
+            <input type="range" id="sliderAgua" min="15" max="35" step="0.1" value="25">
+        </div>
+
+        <div class="slider-container">
+            <div class="slider-label">Temperatura de Bulbo Húmedo</div>
+            <div class="valor" id="tempBulbo">17.0 °C</div>
+            <input type="range" id="sliderBulbo" min="2" max="30" step="0.1" value="17">
+        </div>
+
+        <div class="approach-set">
+            <div class="slider-label">Setpoint de Approach</div>
+            <div class="valor" id="setpointApproach">6.0 °C (Setpoint)</div>
+            <input type="range" id="sliderApproach" min="3" max="12" step="0.1" value="6">
+        </div>
+    </div>
+
+    <script>
+        const sliderAgua = document.getElementById('sliderAgua');
+        const sliderBulbo = document.getElementById('sliderBulbo');
+        const sliderApproach = document.getElementById('sliderApproach');
+
+        const tempAguaText = document.getElementById('tempAgua');
+        const tempBulboText = document.getElementById('tempBulbo');
+        const setpointApproachText = document.getElementById('setpointApproach');
+        const actualApproachText = document.getElementById('actualApproach');
+        const potenciaText = document.getElementById('potencia');
+        const piloto = document.getElementById('piloto');
+        const anillo = document.getElementById('anillo');
+        const estadoVentilador = document.getElementById('estadoVentilador');
+
+        let ventiladorEncendido = false;
+
+        const ctx = document.getElementById('grafico').getContext('2d');
+        const chartData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Temperatura del Agua (°C)',
+                    borderColor: 'red',
+                    yAxisID: 'y',
+                    data: [],
+                    fill: false,
+                },
+                {
+                    label: 'Potencia (%)',
+                    borderColor: 'green',
+                    yAxisID: 'y1',
+                    data: [],
+                    fill: false,
+                },
+                {
+                    label: 'Bulbo Húmedo (°C)',
+                    borderColor: 'blue',
+                    yAxisID: 'y',
+                    data: [],
+                    fill: false,
+                }
+            ]
+        };
+
+        const grafico = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                animation: false,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Temperaturas (°C)'
+                        },
+                        min: 0,
+                        max: 40
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Potencia Ventilador (%)'
+                        },
+                        min: 0,
+                        max: 110,
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+
+        function actualizar() {
+            const tempBulbo = parseFloat(sliderBulbo.value);
+            const setpointApproach = parseFloat(sliderApproach.value);
+            const tempMinAgua = tempBulbo + setpointApproach;
+
+            if (parseFloat(sliderAgua.value) < tempMinAgua) {
+                sliderAgua.value = tempMinAgua;
+            }
+
+            let tempAgua = parseFloat(sliderAgua.value);
+            let approachActual = +(tempAgua - tempBulbo).toFixed(1);
+            let potencia = 0;
+
+            if (!ventiladorEncendido && tempAgua >= 25) {
+                ventiladorEncendido = true;
+            }
+            if (ventiladorEncendido && tempAgua <= 20 && approachActual <= setpointApproach) {
+                ventiladorEncendido = false;
+            }
+
+            approachActual = +(tempAgua - tempBulbo).toFixed(1);
+
+            if (ventiladorEncendido) {
+                piloto.style.backgroundColor = 'green';
+                anillo.style.borderColor = 'limegreen';
+                estadoVentilador.style.display = 'none';
+
+                const delta = approachActual - setpointApproach;
+                if (delta >= 0) {
+                    potencia = 60 + Math.min((delta / 6) * 40, 40);
+                } else {
+                    potencia = 60 - Math.min((-delta / setpointApproach) * 40, 40);
+                    potencia = Math.max(60, potencia);
+                }
+
+                if (tempBulbo > 22) {
+                    const exceso = tempBulbo - 22;
+                    const factorReduccion = Math.min(1, exceso / 8);
+                    potencia *= (1 - 0.3 * factorReduccion);
+                }
+
+            } else {
+                piloto.style.backgroundColor = 'gray';
+                anillo.style.borderColor = 'red';
+                estadoVentilador.style.display = 'block';
+                potencia = 0;
+            }
+
+            tempAguaText.textContent = `${tempAgua.toFixed(1)} °C`;
+            tempBulboText.textContent = `${tempBulbo.toFixed(1)} °C`;
+            setpointApproachText.textContent = `${setpointApproach.toFixed(1)} °C (Setpoint)`;
+            actualApproachText.textContent = `${approachActual.toFixed(1)}`;
+            potenciaText.textContent = `${potencia.toFixed(1)}`;
+
+            const now = new Date();
+            const timeLabel = now.toLocaleTimeString();
+
+            if (chartData.labels.length > 60) {
+                chartData.labels.shift();
+                chartData.datasets[0].data.shift();
+                chartData.datasets[1].data.shift();
+                chartData.datasets[2].data.shift();
+            }
+
+            chartData.labels.push(timeLabel);
+            chartData.datasets[0].data.push(tempAgua);
+            chartData.datasets[1].data.push(potencia);
+            chartData.datasets[2].data.push(tempBulbo);
+
+            grafico.update();
+        }
+
+        sliderAgua.addEventListener('input', actualizar);
+        sliderBulbo.addEventListener('input', actualizar);
+        sliderApproach.addEventListener('input', actualizar);
+
+        setInterval(actualizar, 3000);
+        actualizar();
+    </script>
+
+</body>
+
+</html>
