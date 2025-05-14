@@ -9,89 +9,100 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 3rem;
-            margin-top: 2rem;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            gap: 1.5rem;
         }
 
-        .piloto {
-            position: relative;
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background-color: gray;
-            box-shadow: 0 0 10px #000;
-            margin-bottom: 1rem;
-            transition: background-color 0.3s ease;
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            height: 250px;
         }
 
-        .anillo {
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 10px solid transparent;
-            box-sizing: border-box;
-            pointer-events: none;
+        .panel-control {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
         }
 
         .estado-ventilador {
             font-weight: bold;
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            text-align: center;
+            color: red;
         }
 
-        .valor {
-            font-size: 2rem;
-            color: blue;
+        .piloto {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: gray;
+            box-shadow: 0 0 10px #000;
+            transition: background-color 0.3s ease;
         }
 
-        .slider-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 2rem;
+        .output {
+            font-size: 1rem;
+            text-align: center;
         }
 
         .sliders {
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 600px;
+            padding-bottom: 2rem;
         }
 
-        .output {
-            font-size: 1.2rem;
-        }
-
-        .panel-control {
+        .slider-container,
+        .approach-set {
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
+            padding: 0 1rem;
         }
 
         .slider-label {
             font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        input[type=range] {
-            width: 200px;
-        }
-
-        .approach-set {
-            margin-top: 2rem;
+            margin-bottom: 0.3rem;
             text-align: center;
         }
 
-        .chart-container {
-            margin-top: 2rem;
-            width: 1200px;
-            height: 300px;
+        .valor {
+            font-size: 1.1rem;
+            color: blue;
+            margin-bottom: 0.3rem;
+        }
+
+        input[type=range] {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .chart-container {
+                height: 200px;
+            }
+
+            .piloto {
+                width: 100px;
+                height: 100px;
+            }
+
+            .valor,
+            .slider-label,
+            .output,
+            .estado-ventilador {
+                font-size: 0.95rem;
+            }
         }
     </style>
 </head>
@@ -99,10 +110,8 @@
 <body>
 
     <div class="panel-control">
-        <div id="estadoVentilador" class="estado-ventilador" style="color: red; display: none;">VENTILADOR APAGADO</div>
-        <div class="piloto" id="piloto">
-            <div class="anillo" id="anillo"></div>
-        </div>
+        <div id="estadoVentilador" class="estado-ventilador" style="display: none;">VENTILADOR APAGADO</div>
+        <div class="piloto" id="piloto"></div>
 
         <div class="output">
             <strong>Approach Actual:</strong> <span id="actualApproach">0.0</span> °C
@@ -146,7 +155,6 @@
         const actualApproachText = document.getElementById('actualApproach');
         const potenciaText = document.getElementById('potencia');
         const piloto = document.getElementById('piloto');
-        const anillo = document.getElementById('anillo');
         const estadoVentilador = document.getElementById('estadoVentilador');
 
         let ventiladorEncendido = false;
@@ -236,7 +244,6 @@
 
             if (ventiladorEncendido) {
                 piloto.style.backgroundColor = 'green';
-                anillo.style.borderColor = 'limegreen';
                 estadoVentilador.style.display = 'none';
 
                 const delta = approachActual - setpointApproach;
@@ -255,7 +262,6 @@
 
             } else {
                 piloto.style.backgroundColor = 'gray';
-                anillo.style.borderColor = 'red';
                 estadoVentilador.style.display = 'block';
                 potencia = 0;
             }
