@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CAJA SIMULADORA</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .valor {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>CAJA SIMULADORA</h2>
+
+    <div class="slider-container">
+        <label>T° Succión (°C):
+            <span class="valor" id="val_succion">15.0</span>
+        </label>
+        <input type="range" id="temp_succion" min="-5" max="25" value="15">
+    </div>
+
+    <div class="slider-container">
+        <label>T° Descarga (°C):
+            <span class="valor" id="val_descarga">110.0</span>
+        </label>
+        <input type="range" id="temp_descarga" min="15" max="140" value="110">
+    </div>
+
+    <div class="slider-container">
+        <label>Presión Succión (Bar):
+            <span class="valor" id="val_presion_succion">3.00</span>
+        </label>
+        <input type="range" id="presion_succion" min="0" max="4.5" step="0.01" value="3.00">
+    </div>
+
+    <div class="slider-container">
+        <label>Presión Descarga (Bar):
+            <span class="valor" id="val_presion_descarga">8.0</span>
+        </label>
+        <input type="range" id="presion_descarga" min="6" max="14" step="0.1" value="8.0">
+    </div>
+
+    <div class="slider-container">
+        <label>T° Líquido Condensado (°C):
+            <span class="valor" id="val_liquido">35.0</span>
+        </label>
+        <input type="range" id="temp_liquido" min="25" max="60" value="35">
+    </div>
+
+
+    <script>
+        const sliders = [
+            { id: 'temp_succion', val: 'val_succion' },
+            { id: 'temp_descarga', val: 'val_descarga' },
+            { id: 'presion_succion', val: 'val_presion_succion' },
+            { id: 'presion_descarga', val: 'val_presion_descarga' },
+            { id: 'temp_liquido', val: 'val_liquido' } // NUEVO SLIDER
+        ];
+
+        const currentValues = {};
+        const targetValues = {};
+
+        sliders.forEach(({ id, val }) => {
+            const slider = document.getElementById(id);
+            const output = document.getElementById(val);
+            const initial = parseFloat(slider.value);
+
+            currentValues[id] = initial;
+            targetValues[id] = initial;
+
+            // Escucha cambio en el slider
+            slider.addEventListener('input', () => {
+                targetValues[id] = parseFloat(slider.value);
+            });
+        });
+
+        // Interpolación progresiva
+        function animateValues(duration = 35000) {
+            const start = performance.now();
+
+            function update(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+
+                sliders.forEach(({ id, val }) => {
+                    const output = document.getElementById(val);
+                    const startVal = currentValues[id];
+                    const endVal = targetValues[id];
+
+                    const interpolated = startVal + (endVal - startVal) * progress;
+                    currentValues[id] = interpolated;
+                    output.textContent = interpolated.toFixed(2);
+                });
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Cada vez que cambia un slider, iniciar animación
+        sliders.forEach(({ id }) => {
+            document.getElementById(id).addEventListener('input', () => {
+                animateValues();
+            });
+        });
+
+        // Envío automático cada segundo
+        setInterval(() => {
+            const data = {
+                temp_succion: parseFloat(currentValues['temp_succion'].toFixed(1)),
+                temp_descarga: parseFloat(currentValues['temp_descarga'].toFixed(1)),
+                presion_succion: parseFloat(currentValues['presion_succion'].toFixed(2)),
+                presion_descarga: parseFloat(currentValues['presion_descarga'].toFixed(2)),
+                temp_liquido: parseFloat(currentValues['temp_liquido'].toFixed(1)) // NUEVO DATO
+            };
+
+            fetch('http://127.0.0.1:1880/sliders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('Error en la respuesta');
+                    return res.text();
+                })
+                .then(res => console.log("Enviado:", data))
+                .catch(err => console.error("Fallo al enviar:", err));
+        }, 1000);
+
+    </script>
+
+</body>
+
+</html>
