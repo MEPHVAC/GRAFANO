@@ -13,6 +13,23 @@
 
         h2 {
             color: #333;
+            margin-top: 40px;
+        }
+
+        .grupo {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .grupos-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            /* opcional, para distribuir mejor */
         }
 
         .slider-container {
@@ -38,51 +55,166 @@
 
 <body>
 
-    <h2>CAJA SIMULADORA</h2>
+    <h1>CAJA SIMULADORA</h1>
 
-    <div class="slider-container">
-        <label>T° Succión (°C):
-            <span class="valor" id="val_succion">15.0</span>
-        </label>
-        <input type="range" id="temp_succion" min="-5" max="25" value="15">
+    <!-- Grupo: TORRES ENFRIAMIENTO -->
+    <div class="grupo">
+        <h2>TORRES ENFRIAMIENTO</h2>
+        <div class="slider-container">
+            <label>T° Succión (°C): <span class="valor" id="val_temp_succion">15.0</span></label>
+            <input type="range" id="temp_succion" min="-5" max="25" value="15">
+        </div>
+        <div class="slider-container">
+            <label>T° Descarga (°C): <span class="valor" id="val_temp_descarga">110.0</span></label>
+            <input type="range" id="temp_descarga" min="15" max="140" value="110">
+        </div>
+        <div class="slider-container">
+            <label>Presión Succión (Bar): <span class="valor" id="val_presion_succion">3.00</span></label>
+            <input type="range" id="presion_succion" min="0" max="4.5" step="0.01" value="3.00">
+        </div>
+        <div class="slider-container">
+            <label>Presión Descarga (Bar): <span class="valor" id="val_presion_descarga">8.0</span></label>
+            <input type="range" id="presion_descarga" min="6" max="14" step="0.1" value="8.0">
+        </div>
+        <div class="slider-container">
+            <label>T° Líquido Condensado (°C): <span class="valor" id="val_temp_liquido">35.0</span></label>
+            <input type="range" id="temp_liquido" min="25" max="60" value="35">
+        </div>
     </div>
 
-    <div class="slider-container">
-        <label>T° Descarga (°C):
-            <span class="valor" id="val_descarga">110.0</span>
-        </label>
-        <input type="range" id="temp_descarga" min="15" max="140" value="110">
+    <!-- Repetimos estructura para cada grupo -->
+    <div class="grupo">
+        <h2>ELECTRICIDAD</h2>
+        <div class="slider-container">
+            <label>Voltaje Línea 1 (V): <span class="valor" id="val_elec1">220</span></label>
+            <input type="range" id="elec1" min="200" max="250" value="220">
+        </div>
+        <div class="slider-container">
+            <label>Voltaje Línea 2 (V): <span class="valor" id="val_elec2">220</span></label>
+            <input type="range" id="elec2" min="200" max="250" value="220">
+        </div>
+        <div class="slider-container">
+            <label>Corriente Total (A): <span class="valor" id="val_elec3">100</span></label>
+            <input type="range" id="elec3" min="50" max="150" value="100">
+        </div>
+        <div class="slider-container">
+            <label>Frecuencia (Hz): <span class="valor" id="val_elec4">60</span></label>
+            <input type="range" id="elec4" min="50" max="70" value="60">
+        </div>
+        <div class="slider-container">
+            <label>Factor Potencia: <span class="valor" id="val_elec5">0.95</span></label>
+            <input type="range" id="elec5" min="0.8" max="1" step="0.01" value="0.95">
+        </div>
     </div>
 
-    <div class="slider-container">
-        <label>Presión Succión (Bar):
-            <span class="valor" id="val_presion_succion">3.00</span>
-        </label>
-        <input type="range" id="presion_succion" min="0" max="4.5" step="0.01" value="3.00">
+    <div class="grupo">
+        <h2>VAPOR</h2>
+        <div class="slider-container">
+            <label>Presión Vapor (Bar): <span class="valor" id="val_vapor1">4.0</span></label>
+            <input type="range" id="vapor1" min="1" max="10" step="0.1" value="4.0">
+        </div>
+        <div class="slider-container">
+            <label>Temperatura Vapor (°C): <span class="valor" id="val_vapor2">160</span></label>
+            <input type="range" id="vapor2" min="100" max="200" value="160">
+        </div>
+        <div class="slider-container">
+            <label>Caudal (kg/h): <span class="valor" id="val_vapor3">1000</span></label>
+            <input type="range" id="vapor3" min="500" max="2000" value="1000">
+        </div>
+        <div class="slider-container">
+            <label>Condensado (%) : <span class="valor" id="val_vapor4">85</span></label>
+            <input type="range" id="vapor4" min="0" max="100" value="85">
+        </div>
+        <div class="slider-container">
+            <label>Presión Retorno (Bar): <span class="valor" id="val_vapor5">1.5</span></label>
+            <input type="range" id="vapor5" min="0" max="5" step="0.1" value="1.5">
+        </div>
     </div>
 
-    <div class="slider-container">
-        <label>Presión Descarga (Bar):
-            <span class="valor" id="val_presion_descarga">8.0</span>
-        </label>
-        <input type="range" id="presion_descarga" min="6" max="14" step="0.1" value="8.0">
+    <div class="grupo">
+        <h2>AGUA</h2>
+        <div class="slider-container">
+            <label>Caudal Agua (m³/h): <span class="valor" id="val_agua1">20</span></label>
+            <input type="range" id="agua1" min="0" max="100" value="20">
+        </div>
+        <div class="slider-container">
+            <label>T° Entrada (°C): <span class="valor" id="val_agua2">18</span></label>
+            <input type="range" id="agua2" min="0" max="50" value="18">
+        </div>
+        <div class="slider-container">
+            <label>T° Salida (°C): <span class="valor" id="val_agua3">25</span></label>
+            <input type="range" id="agua3" min="0" max="60" value="25">
+        </div>
+        <div class="slider-container">
+            <label>Conductividad (µS/cm): <span class="valor" id="val_agua4">1200</span></label>
+            <input type="range" id="agua4" min="500" max="3000" value="1200">
+        </div>
+        <div class="slider-container">
+            <label>pH: <span class="valor" id="val_agua5">7.2</span></label>
+            <input type="range" id="agua5" min="5" max="9" step="0.1" value="7.2">
+        </div>
     </div>
 
-    <div class="slider-container">
-        <label>T° Líquido Condensado (°C):
-            <span class="valor" id="val_liquido">35.0</span>
-        </label>
-        <input type="range" id="temp_liquido" min="25" max="60" value="35">
+    <div class="grupo">
+        <h2>CO2</h2>
+        <div class="slider-container">
+            <label>Presión CO₂ (Bar): <span class="valor" id="val_co21">70</span></label>
+            <input type="range" id="co21" min="40" max="100" value="70">
+        </div>
+        <div class="slider-container">
+            <label>T° CO₂ (°C): <span class="valor" id="val_co22">20</span></label>
+            <input type="range" id="co22" min="-10" max="40" value="20">
+        </div>
+        <div class="slider-container">
+            <label>Caudal CO₂ (kg/h): <span class="valor" id="val_co23">500</span></label>
+            <input type="range" id="co23" min="100" max="1000" value="500">
+        </div>
+        <div class="slider-container">
+            <label>Concentración CO₂ (%): <span class="valor" id="val_co24">95</span></label>
+            <input type="range" id="co24" min="80" max="100" value="95">
+        </div>
+        <div class="slider-container">
+            <label>Nivel Tanque CO₂ (%): <span class="valor" id="val_co25">60</span></label>
+            <input type="range" id="co25" min="0" max="100" value="60">
+        </div>
     </div>
-
 
     <script>
         const sliders = [
-            { id: 'temp_succion', val: 'val_succion' },
-            { id: 'temp_descarga', val: 'val_descarga' },
+            // TORRES ENFRIAMIENTO
+            { id: 'temp_succion', val: 'val_temp_succion' },
+            { id: 'temp_descarga', val: 'val_temp_descarga' },
             { id: 'presion_succion', val: 'val_presion_succion' },
             { id: 'presion_descarga', val: 'val_presion_descarga' },
-            { id: 'temp_liquido', val: 'val_liquido' } // NUEVO SLIDER
+            { id: 'temp_liquido', val: 'val_temp_liquido' },
+
+            // ELECTRICIDAD
+            { id: 'elec1', val: 'val_elec1' },
+            { id: 'elec2', val: 'val_elec2' },
+            { id: 'elec3', val: 'val_elec3' },
+            { id: 'elec4', val: 'val_elec4' },
+            { id: 'elec5', val: 'val_elec5' },
+
+            // VAPOR
+            { id: 'vapor1', val: 'val_vapor1' },
+            { id: 'vapor2', val: 'val_vapor2' },
+            { id: 'vapor3', val: 'val_vapor3' },
+            { id: 'vapor4', val: 'val_vapor4' },
+            { id: 'vapor5', val: 'val_vapor5' },
+
+            // AGUA
+            { id: 'agua1', val: 'val_agua1' },
+            { id: 'agua2', val: 'val_agua2' },
+            { id: 'agua3', val: 'val_agua3' },
+            { id: 'agua4', val: 'val_agua4' },
+            { id: 'agua5', val: 'val_agua5' },
+
+            // CO2
+            { id: 'co21', val: 'val_co21' },
+            { id: 'co22', val: 'val_co22' },
+            { id: 'co23', val: 'val_co23' },
+            { id: 'co24', val: 'val_co24' },
+            { id: 'co25', val: 'val_co25' }
         ];
 
         const currentValues = {};
@@ -96,13 +228,12 @@
             currentValues[id] = initial;
             targetValues[id] = initial;
 
-            // Escucha cambio en el slider
             slider.addEventListener('input', () => {
                 targetValues[id] = parseFloat(slider.value);
+                animateValues();
             });
         });
 
-        // Interpolación progresiva
         function animateValues(duration = 35000) {
             const start = performance.now();
 
@@ -114,36 +245,23 @@
                     const output = document.getElementById(val);
                     const startVal = currentValues[id];
                     const endVal = targetValues[id];
-
                     const interpolated = startVal + (endVal - startVal) * progress;
                     currentValues[id] = interpolated;
                     output.textContent = interpolated.toFixed(2);
                 });
 
-                if (progress < 1) {
-                    requestAnimationFrame(update);
-                }
+                if (progress < 1) requestAnimationFrame(update);
             }
 
             requestAnimationFrame(update);
         }
 
-        // Cada vez que cambia un slider, iniciar animación
-        sliders.forEach(({ id }) => {
-            document.getElementById(id).addEventListener('input', () => {
-                animateValues();
-            });
-        });
-
-        // Envío automático cada segundo
         setInterval(() => {
-            const data = {
-                temp_succion: parseFloat(currentValues['temp_succion'].toFixed(1)),
-                temp_descarga: parseFloat(currentValues['temp_descarga'].toFixed(1)),
-                presion_succion: parseFloat(currentValues['presion_succion'].toFixed(2)),
-                presion_descarga: parseFloat(currentValues['presion_descarga'].toFixed(2)),
-                temp_liquido: parseFloat(currentValues['temp_liquido'].toFixed(1)) // NUEVO DATO
-            };
+            const data = {};
+            sliders.forEach(({ id }) => {
+                const value = currentValues[id];
+                data[id] = parseFloat(value.toFixed(2));
+            });
 
             fetch('http://127.0.0.1:1880/sliders', {
                 method: 'POST',
@@ -157,7 +275,6 @@
                 .then(res => console.log("Enviado:", data))
                 .catch(err => console.error("Fallo al enviar:", err));
         }, 1000);
-
     </script>
 
 </body>

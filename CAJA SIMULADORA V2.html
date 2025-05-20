@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Panel de Control con Minigráficos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #222;
+            margin-bottom: 30px;
+        }
+
+        .grupo {
+            border: 2px solid #007BFF;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            background-color: white;
+        }
+
+        h2 {
+            color: #007BFF;
+            margin-bottom: 15px;
+        }
+
+        .slider-container {
+            border: 1px solid #007BFF;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .valor {
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 80px;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Panel de Control</h1>
+
+    <div class="grupo">
+        <h2>Torres de Enfriamiento</h2>
+
+        <div class="slider-container">
+            <label>T° Succión (°C):</label>
+            <div class="controls">
+                <input type="range" id="slider_succion" min="-5" max="25" step="0.1" value="15" />
+                <input type="number" id="input_succion" min="-5" max="25" step="0.1" value="15" />
+                <label>Segundos:</label>
+                <input type="number" id="tiempo_succion" min="0.1" step="0.1" value="2" />
+                <canvas id="grafico_x" width="100" height="30"></canvas>
+                <canvas id="grafico_x_mini" width="60" height="30"
+                    style="margin-left:10px; border:1px solid #ccc; background:#eee;"></canvas>
+            </div>
+        </div>
+
+        <div class="slider-container">
+            <label>T° Descarga (°C):</label>
+            <div class="controls">
+                <input type="range" id="slider_descarga" min="15" max="140" value="110" />
+                <input type="number" id="input_descarga" min="15" max="140" value="110" />
+                <label>Segundos:</label>
+                <input type="number" id="tiempo_descarga" min="0.1" step="0.1" value="2" />
+                <canvas id="grafico_y" width="100" height="30"></canvas>
+                <canvas id="grafico_y_mini" width="60" height="30"
+                    style="margin-left:10px; border:1px solid #ccc; background:#eee;"></canvas>
+            </div>
+        </div>
+
+        <div class="slider-container">
+            <label>Presión Succión (Bar):</label>
+            <div class="controls">
+                <input type="range" id="slider_presion_succion" min="0" max="4.5" step="0.01" value="3.00" />
+                <input type="number" id="input_presion_succion" min="0" max="4.5" step="0.01" value="3.00" />
+                <label>Segundos:</label>
+                <input type="number" id="tiempo_presion_succion" min="0.1" step="0.1" value="2" />
+                <canvas id="grafico_z" width="100" height="30"></canvas>
+                <canvas id="grafico_z_mini" width="60" height="30"
+                    style="margin-left:10px; border:1px solid #ccc; background:#eee;"></canvas>
+            </div>
+        </div>
+
+        <div class="slider-container">
+            <label>Presión Descarga (Bar):</label>
+            <div class="controls">
+                <input type="range" id="slider_presion_descarga" min="6" max="14" step="0.1" value="8.0" />
+                <input type="number" id="input_presion_descarga" min="6" max="14" step="0.1" value="8.0" />
+                <label>Segundos:</label>
+                <input type="number" id="tiempo_presion_descarga" min="0.1" step="0.1" value="2" />
+                <canvas id="grafico_a" width="100" height="30"></canvas>
+                <canvas id="grafico_a_mini" width="60" height="30"
+                    style="margin-left:10px; border:1px solid #ccc; background:#eee;"></canvas>
+            </div>
+        </div>
+
+        <div class="slider-container">
+            <label>T° Líquido Condensado (°C):</label>
+            <div class="controls">
+                <input type="range" id="slider_liquido" min="25" max="60" value="35" />
+                <input type="number" id="input_liquido" min="25" max="60" value="35" />
+                <label>Segundos:</label>
+                <input type="number" id="tiempo_liquido" min="0.1" step="0.1" value="2" />
+                <canvas id="grafico_b" width="100" height="30"></canvas>
+                <canvas id="grafico_b_mini" width="60" height="30"
+                    style="margin-left:10px; border:1px solid #ccc; background:#eee;"></canvas>
+            </div>
+        </div>
+
+        <div class="slider-container">
+            <label>Ingresar ecuación (usar x, y, z, a, b):</label>
+            <div class="controls">
+                <input type="text" id="ecuacion" placeholder="Ej: (x + y) / 2" style="flex:1;" />
+                <span>Resultado Animado: <span id="resultado">0</span></span>
+                <span style="margin-left: 20px;">Resultado Directo: <span id="resultado_inmediato">0</span></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const valoresAnimados = {
+            x: 15,
+            y: 110,
+            z: 3.0,
+            a: 8.0,
+            b: 35
+        };
+
+        const valoresIniciales = {
+            x: 15,
+            y: 110,
+            z: 3.0,
+            a: 8.0,
+            b: 35
+        };
+
+        const historicos = {
+            x: [],
+            y: [],
+            z: [],
+            a: [],
+            b: []
+        };
+
+        const animacionesActivas = {}; // Para controlar animaciones independientes
+
+        function animateValue(start, end, duration, key, callback) {
+            if (animacionesActivas[key]) {
+                cancelAnimationFrame(animacionesActivas[key]);
+            }
+
+            const startTime = performance.now();
+
+            valoresIniciales[key] = start;
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const value = start + (end - start) * progress;
+                const valRounded = parseFloat(value.toFixed(2));
+
+                valoresAnimados[key] = valRounded;
+                historicos[key].push(valRounded);
+                if (historicos[key].length > 50) historicos[key].shift();
+
+                callback(valRounded);
+                drawGraph(key);
+
+                if (progress < 1) {
+                    animacionesActivas[key] = requestAnimationFrame(update);
+                } else {
+                    animacionesActivas[key] = null;
+                    drawMiniGraph(key, valoresIniciales[key], valRounded);
+                }
+            }
+
+            animacionesActivas[key] = requestAnimationFrame(update);
+        }
+
+        function drawGraph(key) {
+            const canvas = document.getElementById("grafico_" + key);
+            const ctx = canvas.getContext("2d");
+            const data = historicos[key];
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.strokeStyle = "#007BFF";
+
+            if (data.length > 0) {
+                const max = Math.max(...data);
+                const min = Math.min(...data);
+                const range = max - min || 1;
+
+                data.forEach((val, i) => {
+                    const x = (i / (data.length - 1)) * canvas.width;
+                    const y = canvas.height - ((val - min) / range) * canvas.height;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+
+                ctx.stroke();
+            }
+        }
+
+        function drawMiniGraph(key, startVal, endVal) {
+            const canvas = document.getElementById("grafico_" + key + "_mini");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujamos línea simple entre valor inicial y final
+            const min = Math.min(startVal, endVal);
+            const max = Math.max(startVal, endVal);
+            const range = max - min || 1;
+
+            const yStart = canvas.height - ((startVal - min) / range) * canvas.height;
+            const yEnd = canvas.height - ((endVal - min) / range) * canvas.height;
+
+            ctx.beginPath();
+            ctx.strokeStyle = "#28a745"; // color verde para mini gráfico
+            ctx.moveTo(0, yStart);
+            ctx.lineTo(canvas.width, yEnd);
+            ctx.stroke();
+        }
+
+
+        function syncSliderAndInput(sliderId, inputId, tiempoId, key) {
+            const slider = document.getElementById(sliderId);
+            const input = document.getElementById(inputId);
+            const tiempo = document.getElementById(tiempoId);
+
+            const updateImmediate = (val) => {
+                slider.value = val;
+                input.value = val;
+            };
+
+            const updateAnimado = (target) => {
+                const start = valoresAnimados[key];
+                const end = parseFloat(target);
+                const seconds = parseFloat(tiempo.value) || 1;
+                const duration = seconds * 1000;
+
+                animateValue(start, end, duration, key, () => {
+                    evaluarEcuacion();
+                });
+            };
+
+            const handleChange = (val) => {
+                updateImmediate(val);
+                updateAnimado(val);
+
+                // Evaluar resultado directo con los valores reales actuales (sin esperar la animación)
+                const valoresActualizados = { ...valoresAnimados, [key]: parseFloat(val) };
+                evaluarResultadoDirecto(valoresActualizados);
+            };
+
+            slider.addEventListener("input", () => handleChange(slider.value));
+            input.addEventListener("input", () => {
+                let val = parseFloat(input.value);
+                if (val < parseFloat(slider.min)) val = slider.min;
+                if (val > parseFloat(slider.max)) val = slider.max;
+                handleChange(val);
+            });
+        }
+
+        syncSliderAndInput("slider_succion", "input_succion", "tiempo_succion", "x");
+        syncSliderAndInput("slider_descarga", "input_descarga", "tiempo_descarga", "y");
+        syncSliderAndInput("slider_presion_succion", "input_presion_succion", "tiempo_presion_succion", "z");
+        syncSliderAndInput("slider_presion_descarga", "input_presion_descarga", "tiempo_presion_descarga", "a");
+        syncSliderAndInput("slider_liquido", "input_liquido", "tiempo_liquido", "b");
+
+        function evaluarEcuacion() {
+            const { x, y, z, a, b } = valoresAnimados;
+            const ecuacion = document.getElementById("ecuacion").value;
+            const resultadoSpan = document.getElementById("resultado");
+
+            try {
+                const resultado = eval(ecuacion);
+                resultadoSpan.textContent = isNaN(resultado) ? "Error" : resultado.toFixed(2);
+            } catch (e) {
+                resultadoSpan.textContent = "Error";
+            }
+        }
+
+        document.getElementById("ecuacion").addEventListener("input", evaluarEcuacion);
+        evaluarEcuacion();
+
+        function evaluarResultadoDirecto(valores) {
+            const { x, y, z, a, b } = valores;
+            const ecuacion = document.getElementById("ecuacion").value;
+            const resultadoInmediatoSpan = document.getElementById("resultado_inmediato");
+
+            try {
+                const resultado = eval(ecuacion);
+                resultadoInmediatoSpan.textContent = isNaN(resultado) ? "Error" : resultado.toFixed(2);
+            } catch (e) {
+                resultadoInmediatoSpan.textContent = "Error";
+            }
+        }
+
+    </script>
+</body>
+
+</html>
