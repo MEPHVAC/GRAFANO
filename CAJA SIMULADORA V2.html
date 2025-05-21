@@ -69,6 +69,7 @@
     <div class="grupo">
         <h2>Torres de Enfriamiento</h2>
 
+        <!-- Sliders con minigráficos -->
         <div class="slider-container">
             <label>T° Succión (°C):</label>
             <div class="controls">
@@ -145,31 +146,10 @@
     </div>
 
     <script>
-        const valoresAnimados = {
-            x: 15,
-            y: 110,
-            z: 3.0,
-            a: 8.0,
-            b: 35
-        };
-
-        const valoresIniciales = {
-            x: 15,
-            y: 110,
-            z: 3.0,
-            a: 8.0,
-            b: 35
-        };
-
-        const historicos = {
-            x: [],
-            y: [],
-            z: [],
-            a: [],
-            b: []
-        };
-
-        const animacionesActivas = {}; // Para controlar animaciones independientes
+        const valoresAnimados = { x: 15, y: 110, z: 3.0, a: 8.0, b: 35 };
+        const valoresIniciales = { ...valoresAnimados };
+        const historicos = { x: [], y: [], z: [], a: [], b: [] };
+        const animacionesActivas = {};
 
         function animateValue(start, end, duration, key, callback) {
             if (animacionesActivas[key]) {
@@ -177,7 +157,6 @@
             }
 
             const startTime = performance.now();
-
             valoresIniciales[key] = start;
 
             function update(currentTime) {
@@ -197,7 +176,7 @@
                     animacionesActivas[key] = requestAnimationFrame(update);
                 } else {
                     animacionesActivas[key] = null;
-                    drawMiniGraph(key, valoresIniciales[key], valRounded);
+                    drawMiniGraph(key, start, end);
                 }
             }
 
@@ -214,8 +193,8 @@
             ctx.strokeStyle = "#007BFF";
 
             if (data.length > 0) {
-                const max = Math.max(...data);
-                const min = Math.min(...data);
+                const max = 25;
+                const min = -5.0;
                 const range = max - min || 1;
 
                 data.forEach((val, i) => {
@@ -236,7 +215,6 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dibujamos línea simple entre valor inicial y final
             const min = Math.min(startVal, endVal);
             const max = Math.max(startVal, endVal);
             const range = max - min || 1;
@@ -245,12 +223,11 @@
             const yEnd = canvas.height - ((endVal - min) / range) * canvas.height;
 
             ctx.beginPath();
-            ctx.strokeStyle = "#28a745"; // color verde para mini gráfico
+            ctx.strokeStyle = "#28a745";
             ctx.moveTo(0, yStart);
             ctx.lineTo(canvas.width, yEnd);
             ctx.stroke();
         }
-
 
         function syncSliderAndInput(sliderId, inputId, tiempoId, key) {
             const slider = document.getElementById(sliderId);
@@ -277,7 +254,6 @@
                 updateImmediate(val);
                 updateAnimado(val);
 
-                // Evaluar resultado directo con los valores reales actuales (sin esperar la animación)
                 const valoresActualizados = { ...valoresAnimados, [key]: parseFloat(val) };
                 evaluarResultadoDirecto(valoresActualizados);
             };
@@ -325,7 +301,6 @@
                 resultadoInmediatoSpan.textContent = "Error";
             }
         }
-
     </script>
 </body>
 
