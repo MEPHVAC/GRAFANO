@@ -188,25 +188,43 @@
             const ctx = canvas.getContext("2d");
             const data = historicos[key];
 
+            // 1. Obtener la duración deseada para ese key
+            const tiempoInput = document.getElementById("tiempo_" + key);
+            const duracionSegundos = parseFloat(tiempoInput?.value) || 2;
+
+            const puntosTotales = Math.floor(duracionSegundos * 30); // 30 FPS aproximado
+            const valores = Array.from({ length: puntosTotales }, (_, i) => {
+                const index = data.length - puntosTotales + i;
+                return index >= 0 ? data[index] : null;
+            });
+
+            // 2. Eje Y dinámico: basado en el último valor conocido ±10%
+            const ultimoValor = valores.findLast(v => v !== null) || 50;
+            const margen = ultimoValor * 0.1;
+            const minY = ultimoValor - margen;
+            const maxY = ultimoValor + margen;
+            const rango = maxY - minY;
+
+            // 3. Dibujar el gráfico estático en X, animado solo en la línea
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.beginPath();
             ctx.strokeStyle = "#007BFF";
 
-            if (data.length > 0) {
-                const max = 25;
-                const min = -5.0;
-                const range = max - min || 1;
-
-                data.forEach((val, i) => {
-                    const x = (i / (data.length - 1)) * canvas.width;
-                    const y = canvas.height - ((val - min) / range) * canvas.height;
-                    if (i === 0) ctx.moveTo(x, y);
+            valores.forEach((val, i) => {
+                const x = (i / (puntosTotales - 1)) * canvas.width;
+                if (val !== null) {
+                    const y = canvas.height - ((val - minY) / rango) * canvas.height;
+                    if (i === 0 || valores[i - 1] === null) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
-                });
+                }
+            });
 
-                ctx.stroke();
-            }
+            ctx.stroke();
         }
+
+
+
+
 
         function drawMiniGraph(key, startVal, endVal) {
             const canvas = document.getElementById("grafico_" + key + "_mini");
