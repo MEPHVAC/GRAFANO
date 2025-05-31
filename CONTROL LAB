@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <h2>Enviar Temperatura a InfluxDB</h2>
+    <form action="/enviar-temperatura" method="POST">
+        <label>Temperatura (°C):</label>
+        <input type="number" name="temperatura" step="0.1" required>
+        <input type="submit" value="Enviar">
+    </form>
+</body>
+
+</html>

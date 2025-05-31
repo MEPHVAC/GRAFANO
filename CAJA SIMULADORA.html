@@ -6,34 +6,48 @@
     <title>CAJA SIMULADORA</title>
     <style>
         body {
-            font-family: sans-serif;
-            padding: 20px;
-            background-color: #f5f5f5;
+            font-family: Arial;
+            color: #3e00f6;
+            /* Color del texto */
+            background-color: #f6f8f7;
+            /* Color de fondo */
         }
 
         h2 {
-            color: #333;
-            margin-top: 40px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #030000;
+            /* Color del título */
+            font-size: 24px;
+            /* Tamaño del título */
+            margin-top: 20px;
+            margin-bottom: 10px;
+            /* Espacio arriba y abajo del título */
+            text-align: center;
+
         }
 
-        .grupo {
-            margin-bottom: 40px;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        .pestañas {
+            margin-bottom: 5px;
+            padding: 5px;
+            background-color: #9bdcfd;
+            border-radius: 5px;
+            flex-direction: column;
         }
 
         .grupos-container {
-            display: flex;
+            display: table-row;
             flex-wrap: wrap;
-            gap: 20px;
-            justify-content: space-between;
-            /* opcional, para distribuir mejor */
+            justify-content: space-around;
+
         }
 
         .slider-container {
-            margin-bottom: 20px;
+            margin: 10px;
+            padding: 10px;
+            background-color: #a9a9a9;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(194, 32, 32, 0.1);
+
         }
 
         label {
@@ -43,54 +57,54 @@
 
         input[type="range"] {
             width: 100%;
-            max-width: 300px;
+            max-width: 500px;
         }
 
-        .valor {
+        .valordelsensor {
             font-weight: bold;
-            margin-left: 10px;
+            margin-left: 5px;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>CAJA SIMULADORA</h1>
+    <h1>SENSORES</h1>
 
     <!-- Grupo: TORRES ENFRIAMIENTO -->
-    <div class="grupo">
-        <h2>TORRES ENFRIAMIENTO</h2>
+    <div class="pestañas">
+        <h2>RACK DE COMPRESORES</h2>
         <div class="slider-container">
-            <label>T° Succión (°C): <span class="valor" id="val_temp_succion">15.0</span></label>
-            <input type="range" id="temp_succion" min="-5" max="25" value="15">
+            <label>T° Succión (°C): <span class="valordelsensor" id="val_temp_succion">5.0</span></label>
+            <input type="range" id="temp_succion" min="-5" max="25" value="5">
         </div>
         <div class="slider-container">
-            <label>T° Descarga (°C): <span class="valor" id="val_temp_descarga">110.0</span></label>
+            <label>T° Descarga (°C): <span class="valordelsensor" id="val_temp_descarga">110.0</span></label>
             <input type="range" id="temp_descarga" min="15" max="140" value="110">
         </div>
         <div class="slider-container">
-            <label>Presión Succión (Bar): <span class="valor" id="val_presion_succion">3.00</span></label>
-            <input type="range" id="presion_succion" min="0" max="4.5" step="0.01" value="3.00">
+            <label>Presión Succión (Bar): <span class="valordelsensor" id="val_presion_succion">3.02</span></label>
+            <input type="range" id="presion_succion" min="0" max="4.5" step="0.01" value="3.02">
         </div>
         <div class="slider-container">
-            <label>Presión Descarga (Bar): <span class="valor" id="val_presion_descarga">8.0</span></label>
-            <input type="range" id="presion_descarga" min="6" max="14" step="0.1" value="8.0">
+            <label>Presión Descarga (Bar): <span class="valordelsensor" id="val_presion_descarga">9.06</span></label>
+            <input type="range" id="presion_descarga" min="6" max="14" step="0.01" value="9.06">
         </div>
         <div class="slider-container">
-            <label>T° Líquido Condensado (°C): <span class="valor" id="val_temp_liquido">35.0</span></label>
-            <input type="range" id="temp_liquido" min="25" max="60" value="35">
+            <label>T° Líquido Condensado (°C): <span class="valordelsensor" id="val_temp_liquido">35.0</span></label>
+            <input type="range" id="temp_liquido" min="20" max="45" value="35">
         </div>
     </div>
 
     <!-- Repetimos estructura para cada grupo -->
-    <div class="grupo">
+    <div class="pestañas">
         <h2>ELECTRICIDAD</h2>
         <div class="slider-container">
-            <label>Voltaje Línea 1 (V): <span class="valor" id="val_elec1">220</span></label>
+            <label>Voltaje Línea 1 (V): <span class="valordelsensor" id="val_elec1">220</span></label>
             <input type="range" id="elec1" min="200" max="250" value="220">
         </div>
         <div class="slider-container">
-            <label>Voltaje Línea 2 (V): <span class="valor" id="val_elec2">220</span></label>
+            <label>Voltaje Línea 2 (V): <span class="valordelsensor" id="val_elec2">220</span></label>
             <input type="range" id="elec2" min="200" max="250" value="220">
         </div>
         <div class="slider-container">
@@ -107,7 +121,7 @@
         </div>
     </div>
 
-    <div class="grupo">
+    <div class="pestañas">
         <h2>VAPOR</h2>
         <div class="slider-container">
             <label>Presión Vapor (Bar): <span class="valor" id="val_vapor1">4.0</span></label>
@@ -181,7 +195,7 @@
 
     <script>
         const sliders = [
-            // TORRES ENFRIAMIENTO
+            // RACK DE COMRPESORES
             { id: 'temp_succion', val: 'val_temp_succion' },
             { id: 'temp_descarga', val: 'val_temp_descarga' },
             { id: 'presion_succion', val: 'val_presion_succion' },
@@ -263,7 +277,7 @@
                 data[id] = parseFloat(value.toFixed(2));
             });
 
-            fetch('http://127.0.0.1:1880/sliders', {
+            fetch('http://192.168.1.15:1880/sliders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
